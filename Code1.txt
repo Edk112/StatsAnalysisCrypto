@@ -1,0 +1,401 @@
+############################################################
+#This code does the following:
+#1. imports required data
+#2. Finds statistical results like min., max., etc for the daily exchange rates with respect to USD
+#3. Finds statistical results like min., max., etc for the log returns of daily exchange rates with respect to USD
+#4. Finds and plots the best fit distributions
+#5. Plots the dynamic volatility graphs
+
+#Note: To plot graphs, use plt.show(). That and the print commands have been removed for convenience. 
+
+############################################################
+
+
+import numpy as np 
+import pandas as pd 
+import scipy.stats as st 
+from matplotlib import pyplot as plt 
+import math
+from scipy import stats
+
+currency = ['Bitcoin', 'Ethereum', 'Dogecoin','Litecoin', 'Nexus', 'Factom', 'PayCoin',  'Phoenixcoin']
+
+def findprice(high, low, price):
+	for i in range(len(high)):
+		price[i] = (high[i]+low[i])/2
+
+	return price
+################################################################################################
+f = open('values1.txt', 'w')
+f.write("The order of the currencies: ")
+print(currency, file = f)
+#Getting all the datasets
+#BITCOIN
+df = pd.read_csv('Bitcoin.csv', usecols = ['Date', 'High', 'Low'])
+df['High'] = pd.to_numeric(df['High'], errors='coerce')
+df['Low'] = pd.to_numeric(df['Low'], errors='coerce')
+bitcoin_dates = df['Date'].tolist()
+bitcoin_price = findprice(df['High'].tolist(), df['Low'].tolist(), np.zeros(len(df['High'].tolist())))
+
+#ETHEREUM
+df = pd.read_csv('Ethereum.csv', usecols = ['Date', 'High', 'Low'])
+df['High'] = pd.to_numeric(df['High'], errors='coerce')
+df['Low'] = pd.to_numeric(df['Low'], errors='coerce')
+ethereum_dates = df['Date'].tolist()
+ethereum_price = findprice(df['High'].tolist(), df['Low'].tolist(), np.zeros(len(df['High'].tolist())))
+
+#DOGECOIN
+df = pd.read_csv('Dogecoin.csv', usecols = ['Date', 'High', 'Low'])
+df['High'] = pd.to_numeric(df['High'], errors='coerce')
+df['Low'] = pd.to_numeric(df['Low'], errors='coerce')
+dogecoin_dates = df['Date'].tolist()
+dogecoin_price = findprice(df['High'].tolist(), df['Low'].tolist(), np.zeros(len(df['High'].tolist())))
+
+#LITECOIN
+df = pd.read_csv('Litecoin.csv', usecols = ['Date', 'High', 'Low'])
+df['High'] = pd.to_numeric(df['High'], errors='coerce')
+df['Low'] = pd.to_numeric(df['Low'], errors='coerce')
+litecoin_dates = df['Date'].tolist()
+litecoin_price = findprice(df['High'].tolist(), df['Low'].tolist(), np.zeros(len(df['High'].tolist())))
+
+#NEXUS
+df = pd.read_csv('Nexus.csv', usecols = ['Date', 'High', 'Low'])
+df['High'] = pd.to_numeric(df['High'], errors='coerce')
+df['Low'] = pd.to_numeric(df['Low'], errors='coerce')
+nexus_dates =  df['Date'].tolist()
+nexus_price = findprice(df['High'].tolist(), df['Low'].tolist(), np.zeros(len(df['High'].tolist())))
+
+#FACTOM
+df = pd.read_csv('Factom.csv', usecols = ['Date', 'High', 'Low'])
+df['High'] = pd.to_numeric(df['High'], errors='coerce')
+df['Low'] = pd.to_numeric(df['Low'], errors='coerce')
+factom_dates  = df['Date'].tolist()
+factom_price = findprice(df['High'].tolist(), df['Low'].tolist(), np.zeros(len(df['High'].tolist())))
+
+
+#PAYCOIN
+df = pd.read_csv('Paycoin.csv', usecols = ['Date', 'High', 'Low'])
+df['High'] = pd.to_numeric(df['High'], errors='coerce')
+df['Low'] = pd.to_numeric(df['Low'], errors='coerce')
+paycoin_dates = df['Date'].tolist()
+paycoin_price = findprice(df['High'].tolist(), df['Low'].tolist(), np.zeros(len(df['High'].tolist())))
+
+#PHOENIXCOIN
+df = pd.read_csv('Phoenixcoin.csv', usecols = ['Date', 'High', 'Low'])
+df['High'] = pd.to_numeric(df['High'], errors='coerce')
+df['Low'] = pd.to_numeric(df['Low'], errors='coerce')
+phoenix_dates  = df['Date'].tolist()
+phoenix_price = findprice(df['High'].tolist(), df['Low'].tolist(), np.zeros(len(df['High'].tolist())))
+
+
+###########################################################################################################################################
+
+dates = [bitcoin_dates, ethereum_dates, dogecoin_dates, litecoin_dates, nexus_dates, factom_dates,  paycoin_dates, phoenix_dates]
+prices = [bitcoin_price, ethereum_price, dogecoin_price, litecoin_price, nexus_price, factom_price,  paycoin_price, phoenix_price]
+
+
+def findlog(prices):
+	logreturns = []
+	for i in range(len(prices)):
+		logstuff = np.zeros(len(prices[i]) - 1)
+		for j in range(len(logstuff)):
+			logstuff[j] = math.log(prices[i][j+1]) - math.log(prices[i][j])
+		logreturns.append(logstuff)
+
+	return logreturns
+
+logreturns = findlog(prices)
+#print(logreturns)
+
+
+
+##############################################################
+#Finding Statistical Values (Defining functions)
+def findmin(prices):
+	minimum = np.zeros(len(prices))
+	for i in range(len(prices)):
+		minimum[i] = min(prices[i])
+	return minimum
+
+def findmax(prices):
+	maximum = np.zeros(len(prices))
+	for i in range(len(prices)):
+		maximum[i] = max(prices[i])
+	return maximum
+
+def findmedian(prices):
+	median = np.zeros(len(prices))
+	for i in range(len(prices)):
+		median[i] = np.median(prices[i])
+	return median
+
+def findmean(prices):
+	mean = np.zeros(len(prices))
+	for i in range(len(prices)):
+		mean[i] = np.mean(prices[i])
+	return mean
+
+def findkurtosis(prices):
+	kurtosis = np.zeros(len(prices))
+	for i in range(len(prices)):
+		kurtosis[i] = st.kurtosis(prices[i])
+	return kurtosis
+
+def findskewness(prices):
+	skewness = np.zeros(len(prices))
+	for i in range(len(prices)):
+		skewness[i] = st.skew(prices[i])
+	return skewness
+
+def findSD(prices):
+	SD = np.zeros(len(prices))
+	for i in range(len(prices)):
+		SD[i] = np.std(prices[i])
+	return SD
+
+def findvariance(prices):
+	variance = np.zeros(len(prices))
+	for i in range(len(prices)):
+		variance[i] = np.var(prices[i])
+	return variance
+
+def findrange(prices):
+	Range = np.zeros(len(prices))
+	for i in range(len(prices)):
+		Range[i] = np.ptp(prices[i])
+	return Range
+
+def findIQR(prices):
+	IQR = np.zeros(len(prices))
+	for i in range(len(prices)):
+		IQR[i] = st.iqr(prices[i])
+	return IQR
+
+def findQ1(prices):
+	Q1 = np.zeros(len(prices))
+	for i in range(len(prices)):
+		Q1[i] = np.percentile(prices[i], 25)
+	return Q1
+
+def findQ3(prices):
+	Q3 = np.zeros(len(prices))
+	for i in range(len(prices)):
+		Q3[i] = np.percentile(prices[i], 75)
+	return Q3
+
+functions = [findmin, findmax, findmedian, findmean, findkurtosis, findskewness, findSD, findvariance, findrange, findIQR, findQ1, findQ3]
+
+f.write("The functions in order are: Min, Max, Median, Mean, kurtosis, skewness, SD, variance, range, IQR, Q1, Q3\n")
+
+#Find statistical values for daily exchange rates and save them in a file
+f.write("DAILY RETURNS\n")
+for i in range(len(functions)):
+	print(functions[i](prices), file = f)
+f.write("\n")
+
+#Find statistical values for log returns and save them in a file
+f.write("LOG RETURNS\n")
+for i in range(len(functions)):
+	print(functions[i](logreturns), file = f)
+
+f.close( )
+
+###################################################################
+#Plots: Exchange rates
+fig1, ax1 = plt.subplots(4, 2, figsize = (8, 8))
+fig1.suptitle("Daily exchange rates from October 10, 2015 to August 31st, 2019")
+plt.subplots_adjust(hspace = 0.5)
+count = 0
+for i in range(4):
+	for j in range(2):
+		ax1[i, j].plot(np.linspace(2015.75, 2019.75, len(prices[count])), prices[count], 'b-')
+		ax1[i, j].set_title(currency[count])
+		count = count + 1
+
+#Plots: Daily log returns
+fig2, ax2 = plt.subplots(4, 2, figsize = (8, 8))
+fig2.suptitle("Daily log returns from October 11, 2015 to August 31st, 2019")
+plt.subplots_adjust(hspace = 0.5)
+count = 0
+for i in range(4):
+	for j in range(2):
+		
+		ax2[i, j].hist(logreturns[count], bins = 20)
+		ax2[i, j].set_title(currency[count])
+		ax2[i, j].set_ylim(0, 1500)
+		count = count + 1
+#fig3, ax3 = plt.subplots()
+#ax3.hist(logreturns[0])
+#############################################################################################
+#FINDING STANDARD DEVIATIONS FOR DYNAMIC VOLATILITY
+#plt.show()
+standard_dev = []
+def divide_chunks(l, n): 
+      
+    # looping till length l 
+    for i in range(0, len(l), n):  
+        yield l[i:i + n] 
+
+standard_dev = list(divide_chunks(logreturns[0], 20))
+#print(standard_dev)
+req_SD = findSD(standard_dev)
+#print(req_SD)
+plt.figure()
+plt.hist(req_SD)
+plt.suptitle("Bitcoin")
+
+standard_dev = list(divide_chunks(logreturns[1], 20))
+req_SD = findSD(standard_dev)
+plt.figure()
+plt.hist(req_SD)
+plt.suptitle("Ethereum")
+
+standard_dev = list(divide_chunks(logreturns[2], 20))
+req_SD = findSD(standard_dev)
+plt.figure()
+plt.hist(req_SD)
+plt.suptitle("Dogecoin")
+
+standard_dev = list(divide_chunks(logreturns[3], 20))
+req_SD = findSD(standard_dev)
+plt.figure()
+plt.hist(req_SD)
+plt.suptitle("Litecoin")
+
+standard_dev = list(divide_chunks(logreturns[4], 20))
+req_SD = findSD(standard_dev)
+plt.figure()
+plt.hist(req_SD)
+plt.suptitle("Nexus")
+
+standard_dev = list(divide_chunks(logreturns[5], 20))
+req_SD = findSD(standard_dev)
+plt.figure()
+plt.hist(req_SD)
+plt.suptitle("Factom")
+
+standard_dev = list(divide_chunks(logreturns[6], 20))
+req_SD = findSD(standard_dev)
+plt.figure()
+plt.hist(req_SD)
+plt.suptitle("Paycoin")
+
+standard_dev = list(divide_chunks(logreturns[7], 20))
+req_SD = findSD(standard_dev)
+plt.figure()
+plt.hist(req_SD)
+plt.suptitle("Phoenixcoin")
+#
+######################################################################################################################
+#FITTING DISTRIBUTIONS
+
+distributions = ["Student's T", 'Laplace', 'Skew T', 'Generalized T', 'Skewed StudentsT', 'asymmetric studentsT', 'normal inverse guassian', 'generalized hyperbolic']
+##########STUDENTS T############################
+count = 0
+fit_param = []
+studentsT = []
+fig4, ax4 = plt.subplots(4, 2, figsize = (8, 8))
+plt.subplots_adjust(hspace = 0.5)
+fig4.suptitle('Student\'s t Distribution')
+for i in range(4):
+	for j in range(2):
+		param = stats.t.fit(logreturns[count])
+		x = np.linspace(-0.5,0.5,100)
+		studentsT.append(param)
+
+		pdf_fitted = stats.t.pdf(x,loc=param[1],scale=param[2],df=param[0])
+		ax4[i, j].plot(x,pdf_fitted,'r-')
+		ax4[i, j].hist(logreturns[count], density=1,alpha=0.3, bins = 20)
+		ax4[i, j].set_title(currency[count])
+		ax4[i, j].set_xlim(-0.5, 0.5)
+		count = count + 1
+fit_param.append(studentsT)
+
+
+######LAPLACE###############
+count = 0
+Laplace = []
+fig5, ax5 = plt.subplots(4, 2, figsize = (8, 8))
+plt.subplots_adjust(hspace = 0.5)
+fig5.suptitle('Laplace')
+for i in range(4):
+	for j in range(2):
+		param = stats.laplace.fit(logreturns[count])
+		x = np.linspace(-0.5,0.5,100)
+		Laplace.append(param)
+
+		pdf_fitted = stats.laplace.pdf(x,loc=param[0],scale=param[1])
+		ax5[i, j].plot(x,pdf_fitted,'r-')
+		ax5[i, j].hist(logreturns[count], density=1,alpha=0.3, bins = 20)
+		ax5[i, j].set_title(currency[count])
+		ax5[i, j].set_xlim(-0.5, 0.5)
+		count = count + 1
+fit_param.append(Laplace)
+
+#############asymmetric Students T######################
+count = 0
+AST = []
+fig6, ax6 = plt.subplots(4, 2, figsize = (8, 8))
+plt.subplots_adjust(hspace = 0.5)
+fig6.suptitle('AST')
+for i in range(4):
+	for j in range(2):
+		param = stats.nct.fit(logreturns[count])
+		x = np.linspace(-0.5,0.5,100)
+		AST.append(param)
+
+		pdf_fitted = stats.nct.pdf(x,df = param[0], nc = param[1], loc=param[2],scale=param[3])
+		ax6[i, j].plot(x,pdf_fitted,'r-')
+		ax6[i, j].hist(logreturns[count], density=1,alpha=0.3, bins = 20)
+		ax6[i, j].set_title(currency[count])
+		ax6[i, j].set_xlim(-0.5, 0.5)
+		count = count + 1
+fit_param.append(AST)
+
+##############normal inverse gauss########################
+count = 0
+NIG = []
+fig7, ax7 = plt.subplots(4, 2, figsize = (8, 8))
+plt.subplots_adjust(hspace = 0.5)
+fig7.suptitle('Normal Inverse gauss')
+for i in range(4):
+	for j in range(2):
+		param = stats.norminvgauss.fit(logreturns[count])
+		x = np.linspace(-0.5,0.5,100)
+		NIG.append(param)
+
+		pdf_fitted = stats.norminvgauss.pdf(x,a = param[0], b=param[1], loc=param[2],scale=param[3])
+		ax7[i, j].plot(x,pdf_fitted,'r-')
+		ax7[i, j].hist(logreturns[count], density=1,alpha=0.3, bins = 20)
+		ax7[i, j].set_title(currency[count])
+		ax7[i, j].set_xlim(-0.5, 0.5)
+		count = count + 1
+fit_param.append(NIG)
+#print(fit_param)
+#plt.show()
+
+########################BETA#######################
+
+count = 0
+AT = []
+fig10, ax10 = plt.subplots(4, 2, figsize = (8, 8))
+plt.subplots_adjust(hspace = 0.5)
+fig10.suptitle('AT')
+for i in range(4):
+	for j in range(2):
+		param = stats.beta.fit(logreturns[count])
+		x = np.linspace(-0.5,0.5,100)
+		AT.append(param)
+
+		pdf_fitted = stats.beta.pdf(x, a = param[0], b = param[1], loc=param[2],scale=param[3])
+		ax10[i, j].plot(x,pdf_fitted,'r-')
+		ax10[i, j].hist(logreturns[count], density=1,alpha=0.3, bins = 20)
+		ax10[i, j].set_title(currency[count])
+		ax10[i, j].set_xlim(-0.5, 0.5)
+		count = count + 1
+
+#plt.show()
+
+
+
+ 
